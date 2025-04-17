@@ -1,90 +1,92 @@
 import React from 'react';
+import { Home, Users, DollarSign, Award } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
-  const navigateTo = (path) => {
-    // This function would use router navigation in a real implementation
-    console.log(`Navigate to: ${path}`);
-    // In a real app with react-router: navigate(path)
-  };
+  const navigate = useNavigate();
+  
+  const menuItems = [
+    {
+      title: 'Quản lý Tay Đua & Đội Đua',
+      description: 'Thêm, sửa, xóa và quản lý thông tin về tay đua và đội đua F1',
+      icon: <Users size={48} className="text-blue-600" />,
+      path: '/drivers-teams',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200'
+    },
+    {
+      title: 'Quản lý Nhà Tài Trợ',
+      description: 'Quản lý nhà tài trợ và ký kết hợp đồng tài trợ',
+      icon: <DollarSign size={48} className="text-green-600" />,
+      path: '/sponsors',
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-200'
+    },
+    {
+      title: 'Quản lý Giải Thưởng',
+      description: 'Quản lý giải thưởng và thanh toán cho tay đua/đội đua',
+      icon: <Award size={48} className="text-purple-600" />,
+      path: '/races-awards',
+      bgColor: 'bg-purple-50',
+      borderColor: 'border-purple-200'
+    }
+  ];
 
-  const cardStyle = {
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    padding: '20px',
-    margin: '15px 0',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-    cursor: 'pointer',
-    transition: 'transform 0.3s ease'
+  const handleNavigation = (path) => {
+    navigate(path);
   };
 
   return (
-    <div className="p-6">
-      <header className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-blue-800">F1 Management System</h1>
-        <p className="text-lg text-gray-600 mt-2">
-          Manage teams, drivers, sponsors, and prize payments for Formula 1
-        </p>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Teams & Drivers Card */}
-        <div 
-          style={cardStyle} 
-          className="bg-white hover:bg-gray-50"
-          onClick={() => navigateTo('/teams-drivers')}
-        >
-          <h2 className="text-xl font-bold mb-3 text-blue-700">Teams & Drivers Management</h2>
-          <p className="text-gray-600">
-            View and manage Formula 1 teams and their drivers. See team details, driver information,
-            and their current standings.
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+            Hệ Thống Quản Lý F1
+          </h1>
+          <p className="mt-5 max-w-xl mx-auto text-xl text-gray-500">
+            Quản lý tay đua, đội đua, nhà tài trợ và giải thưởng cho giải đua F1
           </p>
-          <div className="mt-4 flex justify-end">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-              Manage Teams & Drivers
-            </button>
-          </div>
         </div>
 
-        {/* Sponsors Card */}
-        <div 
-          style={cardStyle} 
-          className="bg-white hover:bg-gray-50"
-          onClick={() => navigateTo('/sponsors')}
-        >
-          <h2 className="text-xl font-bold mb-3 text-blue-700">Sponsorship Management</h2>
-          <p className="text-gray-600">
-            Handle sponsorship contracts, track payments, and manage relationships with 
-            sponsors. Create and monitor sponsorship agreements.
-          </p>
-          <div className="mt-4 flex justify-end">
-            <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-              Manage Sponsors
-            </button>
-          </div>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+          {menuItems.map((item, index) => (
+            <div 
+              key={index} 
+              onClick={() => handleNavigation(item.path)}
+              className={`${item.bgColor} ${item.borderColor} border-2 rounded-xl p-8 transition-all duration-200 hover:shadow-lg hover:scale-105 cursor-pointer`}
+            >
+              <div className="text-center">
+                <div className="flex justify-center mb-4">
+                  {item.icon}
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{item.title}</h2>
+                <p className="text-gray-600">{item.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Prizes Card */}
-        <div 
-          style={cardStyle} 
-          className="bg-white hover:bg-gray-50"
-          onClick={() => navigateTo('/prizes')}
-        >
-          <h2 className="text-xl font-bold mb-3 text-blue-700">Prize Management</h2>
-          <p className="text-gray-600">
-            Process and track prize payments to teams and drivers. View race results,
-            prize structures, and payment history.
-          </p>
-          <div className="mt-4 flex justify-end">
-            <button className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
-              Manage Prizes
-            </button>
+        <div className="mt-16 bg-white shadow rounded-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Tổng Quan Hệ Thống</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Đội Đua & Tay Đua</h3>
+              <p className="text-gray-600 mb-2">Quản lý thông tin cơ bản và liên hệ</p>
+              <span className="text-blue-600 font-medium">4 đội đua, 8 tay đua</span>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Nhà Tài Trợ</h3>
+              <p className="text-gray-600 mb-2">Quản lý hợp đồng và giao dịch</p>
+              <span className="text-green-600 font-medium">4 nhà tài trợ, 4 hợp đồng</span>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-lg text-gray-900 mb-2">Giải Đua & Kết Quả</h3>
+              <p className="text-gray-600 mb-2">Quản lý kết quả và giải thưởng</p>
+              <span className="text-purple-600 font-medium">4 giải đua, 12 kết quả</span>
+            </div>
           </div>
         </div>
       </div>
-
-      <footer className="mt-12 text-center text-gray-500">
-        <p>© 2025 F1 Management System</p>
-      </footer>
     </div>
   );
 };

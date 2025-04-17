@@ -27,9 +27,29 @@ public class RaceService {
                 .map(this::convertToDTO);
     }
 
+    public RaceDTO createRace(RaceDTO raceDTO) {
+        Race race = convertToEntity(raceDTO);
+        return convertToDTO(raceRepository.save(race));
+    }
 
-    private RaceDTO convertToDTO(Race race){
-        return  RaceDTO.builder()
+    public Optional<RaceDTO> updateRace(RaceDTO raceDTO) {
+        if (!raceRepository.existsById(raceDTO.getRaceId())) {
+            return Optional.empty();
+        }
+        Race race = convertToEntity(raceDTO);
+        return Optional.of(convertToDTO(raceRepository.save(race)));
+    }
+
+    public boolean deleteRace(Integer id) {
+        if (!raceRepository.existsById(id)) {
+            return false;
+        }
+        raceRepository.deleteById(id);
+        return true;
+    }
+
+    private RaceDTO convertToDTO(Race race) {
+        return RaceDTO.builder()
                 .raceId(race.getRaceId())
                 .raceName(race.getRaceName())
                 .raceYear(race.getRaceYear())
@@ -38,6 +58,19 @@ public class RaceService {
                 .location(race.getLocation())
                 .circuitName(race.getCircuitName())
                 .status(race.getStatus())
+                .build();
+    }
+
+    private Race convertToEntity(RaceDTO raceDTO) {
+        return Race.builder()
+                .raceId(raceDTO.getRaceId())
+                .raceName(raceDTO.getRaceName())
+                .raceYear(raceDTO.getRaceYear())
+                .raceDate(raceDTO.getRaceDate())
+                .country(raceDTO.getCountry())
+                .location(raceDTO.getLocation())
+                .circuitName(raceDTO.getCircuitName())
+                .status(raceDTO.getStatus())
                 .build();
     }
 }

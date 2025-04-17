@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface PrizePaymentRepository extends JpaRepository<PrizePayment, Integer> {
     List<PrizePayment> findByRaceId(Integer raceId);
+    List<PrizePayment> findByDriverId(Integer driverId);
+    List<PrizePayment> findByTeamId(Integer teamId);
 }

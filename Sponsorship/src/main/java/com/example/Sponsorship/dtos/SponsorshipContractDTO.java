@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class SponsorshipContractDTO {
     private Integer contractId;
     private Integer sponsorId;
-    private Integer sponsorshipTypeId;
+    private Integer typeId;
     private Integer seasonYear;
     private LocalDate startDate;
     private LocalDate endDate;

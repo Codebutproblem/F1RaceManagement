@@ -27,6 +27,18 @@ public class PrizePaymentService {
                 .collect(Collectors.toList());
     }
 
+    public List<PrizePaymentDTO> getPaymentsByDriverId(Integer driverId) {
+        return prizePaymentRepository.findByDriverId(driverId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<PrizePaymentDTO> getPaymentsByTeamId(Integer teamId) {
+        return prizePaymentRepository.findByTeamId(teamId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     public PrizePaymentDTO createPrizePayment(PrizePaymentDTO prizePaymentDTO) {
         PrizePayment prizePayment = convertToEntity(prizePaymentDTO);
         PrizePayment savedPayment = prizePaymentRepository.save(prizePayment);
@@ -37,7 +49,6 @@ public class PrizePaymentService {
         PrizePayment prizePayment = prizePaymentRepository.findById(paymentId)
                 .orElseThrow(() -> new RuntimeException("Prize payment not found with id: " + paymentId));
 
-        prizePayment.setStatus(prizePaymentDTO.getStatus());
         PrizePayment updatedPayment = prizePaymentRepository.save(prizePayment);
         return convertToDTO(updatedPayment);
     }
@@ -49,9 +60,9 @@ public class PrizePaymentService {
                 .driverId(prizePayment.getDriverId())
                 .teamId(prizePayment.getTeamId())
                 .amount(prizePayment.getAmount())
-                .position(prizePayment.getPosition())
-                .prizeCategory(prizePayment.getPrizeCategory())
-                .status(prizePayment.getStatus())
+                .recipientType(prizePayment.getRecipientType())
+                .paymentDate(prizePayment.getPaymentDate())
+                .recipientId(prizePayment.getRecipientId())
                 .build();
     }
 
@@ -62,9 +73,9 @@ public class PrizePaymentService {
         payment.setRaceId(dto.getRaceId());
         payment.setDriverId(dto.getDriverId());
         payment.setAmount(dto.getAmount());
-        payment.setPosition(dto.getPosition());
-        payment.setStatus(dto.getStatus());
-        payment.setPrizeCategory(dto.getPrizeCategory());
+        payment.setRecipientType(dto.getRecipientType());
+        payment.setPaymentDate(dto.getPaymentDate());
+        payment.setRecipientId(dto.getRecipientId());
         return payment;
     }
 }

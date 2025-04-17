@@ -39,4 +39,12 @@ public class SponsorController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteSponsor(@PathVariable Integer id) {
+        return sponsorService.deleteSponsor(id)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.notFound().build();
+    }
+
 }

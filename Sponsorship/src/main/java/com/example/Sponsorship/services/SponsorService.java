@@ -47,30 +47,36 @@ public class SponsorService {
 
         if (sponsor.isPresent()) {
             Sponsor existingSponsor = sponsor.get();
-            String sponsorName = sponsorDTO.getSponsorName();
-            if (sponsorName != null && !sponsorName.isEmpty()) {
-                existingSponsor.setSponsorName(sponsorName);
+
+            if (sponsorDTO.getSponsorName() != null) {
+                existingSponsor.setSponsorName(sponsorDTO.getSponsorName());
             }
-            String contactEmail = sponsorDTO.getContactEmail();
-            if (contactEmail != null && !contactEmail.isEmpty()) {
-                existingSponsor.setContactEmail(contactEmail);
+            if (sponsorDTO.getContactEmail() != null) {
+                existingSponsor.setContactEmail(sponsorDTO.getContactEmail());
             }
-            String contactPhone = sponsorDTO.getContactPhone();
-            if (contactPhone != null && !contactPhone.isEmpty()) {
-                existingSponsor.setContactPhone(contactPhone);
+            if (sponsorDTO.getContactPhone() != null) {
+                existingSponsor.setContactPhone(sponsorDTO.getContactPhone());
             }
-            String contactPerson = sponsorDTO.getContactPerson();
-            if (contactPerson != null && !contactPerson.isEmpty()) {
-                existingSponsor.setContactPerson(contactPerson);
+            if (sponsorDTO.getContactPerson() != null) {
+                existingSponsor.setContactPerson(sponsorDTO.getContactPerson());
             }
-            String industry = sponsorDTO.getIndustry();
-            if (industry != null && !industry.isEmpty()) {
-                existingSponsor.setIndustry(industry);
+            if (sponsorDTO.getIndustry() != null) {
+                existingSponsor.setIndustry(sponsorDTO.getIndustry());
             }
+
             Sponsor updatedSponsor = sponsorRepository.save(existingSponsor);
             return Optional.of(ConvertUtils.convertToDTO(updatedSponsor));
         }
 
         return Optional.empty();
+    }
+
+    @Transactional
+    public boolean deleteSponsor(Integer id) {
+        if (sponsorRepository.existsById(id)) {
+            sponsorRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

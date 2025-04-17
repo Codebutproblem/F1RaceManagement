@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "prize_payments")
@@ -24,23 +25,19 @@ public class PrizePayment {
     @Column(nullable = false)
     private Integer raceId;
 
-    @Column(nullable = false)
     private Integer driverId;
 
-    @Column(nullable = false)
     private Integer teamId;
+
+    @Column(name = "recipient_id", nullable = false)
+    private Integer recipientId;
 
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
-    @Column(length = 50)
-    private String status = "Pending";
+    @Column(name = "recipient_type", nullable = false, length = 10)
+    private String recipientType;
 
-    @Column(length = 100)
-    private String prizeCategory;
-
-    private Integer position;
-
-    @CreationTimestamp
-    private Timestamp createdAt;
+    @Column(name = "payment_date")
+    private LocalDate paymentDate;
 }

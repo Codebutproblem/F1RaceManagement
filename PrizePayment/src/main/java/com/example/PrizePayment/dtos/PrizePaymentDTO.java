@@ -12,9 +12,9 @@ public class PrizePaymentDTO {
     private Integer paymentId;
     private Integer raceId;
     private Integer driverId;
+    private Integer recipientId;
     private Integer teamId;
     private BigDecimal amount;
-    private String status;
-    private String prizeCategory;
-    private Integer position;
+    private String recipientType;
+    private LocalDate paymentDate;
 }

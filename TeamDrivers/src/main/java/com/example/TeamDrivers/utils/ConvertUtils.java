@@ -41,4 +41,35 @@ public final class ConvertUtils {
         driverDto.setTeamId(driver.getTeam().getTeamId());
         return driverDto;
     }
+
+    public static Driver convertToDriver(DriverDTO driverDTO){
+        Driver driver = new Driver();
+        driver.setDriverId(driverDTO.getDriverId());
+        driver.setFirstName(driverDTO.getFirstName());
+        driver.setLastName(driverDTO.getLastName());
+        driver.setNationality(driverDTO.getNationality());
+        driver.setDateOfBirth(driverDTO.getDateOfBirth());
+        driver.setDriverNumber(driverDTO.getDriverNumber());
+        driver.setBankAccount(driverDTO.getBankAccount());
+        driver.setBankDetails(driverDTO.getBankDetails());
+        driver.setActiveStatus(driverDTO.getActiveStatus());
+        driver.setCreatedAt(driverDTO.getCreatedAt());
+        driver.setUpdatedAt(driverDTO.getUpdatedAt());
+        return driver;
+    }
+
+    public static Team convertToTeam(TeamDTO teamDTO){
+        Team team = new Team();
+        team.setTeamId(teamDTO.getTeamId());
+        team.setTeamName(teamDTO.getTeamName());
+        team.setTeamPrincipal(teamDTO.getTeamPrincipal());
+        team.setNationality(teamDTO.getNationality());
+        team.setHeadquarters(teamDTO.getHeadquarters());
+        team.setFoundingYear(teamDTO.getFoundingYear());
+        team.setBankAccount(teamDTO.getBankAccount());
+        team.setBankDetails(teamDTO.getBankDetails());
+        team.setCreatedAt(teamDTO.getCreatedAt());
+        team.setUpdatedAt(teamDTO.getUpdatedAt());
+        return team;
+    }
 }

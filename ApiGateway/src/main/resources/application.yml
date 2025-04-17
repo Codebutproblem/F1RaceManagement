@@ -15,7 +15,7 @@ spring:
         - id: sponsorship-service
           uri: lb://sponsorship-service
           predicates:
-            - Path=/api/sponsors/**,/api/sponsorship-contracts/**,/api/sponsorship-types/**,/api/sponsorship-payments/**
+            - Path=/api/sponsors/**,/api/contracts/**,/api/sponsorship-types/**,/api/payments/**
           filters:
             - RewritePath=/api/(?<segment>.*), /api/$\{segment}
 
@@ -26,7 +26,30 @@ spring:
           filters:
             - RewritePath=/api/(?<segment>.*), /api/$\{segment}
 
+        - id: race-management-service
+          uri: lb://race-management-service
+          predicates:
+            - Path=/api/races/**,/api/results/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /api/$\{segment}
+
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: DEBUG

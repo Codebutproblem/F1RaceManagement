@@ -1,8 +1,6 @@
 package com.example.Sponsorship.services;
 
-import com.example.Sponsorship.dtos.SponsorDTO;
 import com.example.Sponsorship.dtos.SponsorshipContractDTO;
-import com.example.Sponsorship.dtos.SponsorshipTypeDTO;
 import com.example.Sponsorship.models.Sponsor;
 import com.example.Sponsorship.models.SponsorshipContract;
 import com.example.Sponsorship.models.SponsorshipType;
@@ -12,8 +10,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,18 +17,8 @@ import java.util.stream.Collectors;
 @Service
 public class SponsorshipContractService {
 
-    private final SponsorshipContractRepository contractRepository;
-
-    private final SponsorService sponsorService;
-
-    private final SponsorshipTypeService sponsorshipTypeService;
-
     @Autowired
-    public SponsorshipContractService(SponsorshipContractRepository contractRepository, SponsorService sponsorService, SponsorshipTypeService sponsorshipTypeService) {
-        this.contractRepository = contractRepository;
-        this.sponsorService = sponsorService;
-        this.sponsorshipTypeService = sponsorshipTypeService;
-    }
+    private SponsorshipContractRepository contractRepository;
 
     public List<SponsorshipContractDTO> getAllContracts() {
         return contractRepository.findAll()
@@ -45,70 +31,69 @@ public class SponsorshipContractService {
         return contractRepository.findById(id).map(ConvertUtils::convertToDTO);
     }
 
-    public SponsorshipContractDTO createContract(SponsorshipContractDTO dto) {
-        Sponsor sponsor = sponsorService.getSponsorById(dto.getSponsorId())
-                .map(ConvertUtils::convertToEntity)
-                .orElseThrow(() -> new IllegalArgumentException("Sponsor ID không hợp lệ"));
-
-        SponsorshipType sponsorshipType = sponsorshipTypeService.getSponsorshipTypeById(dto.getSponsorshipTypeId())
-                .map(ConvertUtils::convertToEntity)
-                .orElseThrow(() -> new IllegalArgumentException("Sponsorship Type ID không hợp lệ"));
-
+    public SponsorshipContractDTO createContract(SponsorshipContractDTO contractDTO) {
+        Sponsor sponsor = new Sponsor();
+        SponsorshipType type = new SponsorshipType();
+        sponsor.setSponsorId(contractDTO.getSponsorId());
+        type.setTypeId(contractDTO.getTypeId());
         SponsorshipContract contract = SponsorshipContract.builder()
                 .sponsor(sponsor)
-                .sponsorshipType(sponsorshipType)
-                .seasonYear(dto.getSeasonYear())
-                .startDate(dto.getStartDate())
-                .endDate(dto.getEndDate())
-                .contractValue(dto.getContractValue())
-                .paymentTerms(dto.getPaymentTerms())
-                .status(dto.getStatus())
+                .sponsorshipType(type)
+                .startDate(contractDTO.getStartDate())
+                .endDate(contractDTO.getEndDate())
+                .contractValue(contractDTO.getContractValue())
+                .status(contractDTO.getStatus())
+                .paymentTerms(contractDTO.getPaymentTerms())
+                .seasonYear(contractDTO.getSeasonYear())
                 .build();
-
-        return ConvertUtils.convertToDTO(contractRepository.save(contract));
+        SponsorshipContract savedContract = contractRepository.save(contract);
+        return ConvertUtils.convertToDTO(savedContract);
     }
 
-    public Optional<SponsorshipContractDTO> updateContract(Integer id, SponsorshipContractDTO sponsorshipContractDTO) {
-        Optional<SponsorshipContract> contract = contractRepository.findById(id);
+    @Transactional
+    public Optional<SponsorshipContractDTO> updateContract(Integer id, SponsorshipContractDTO contractDTO) {
+        Optional<SponsorshipContract> contractOptional = contractRepository.findById(id);
 
-        if (contract.isPresent()) {
-            SponsorshipContract existingContract = contract.get();
-            Integer seasonYear = sponsorshipContractDTO.getSeasonYear();
-            if(seasonYear != null){
-                existingContract.setSeasonYear(seasonYear);
+        if (contractOptional.isPresent()) {
+            Sponsor sponsor = new Sponsor();
+            SponsorshipType type = new SponsorshipType();
+            sponsor.setSponsorId(contractDTO.getSponsorId());
+            type.setTypeId(contractDTO.getTypeId());
+            SponsorshipContract contract = contractOptional.get();
+
+            if (contractDTO.getSponsorId() != null) {
+                contract.setSponsor(sponsor);
+            }
+            if (contractDTO.getTypeId() != null) {
+                contract.setSponsorshipType(type);
+            }
+            if (contractDTO.getStartDate() != null) {
+                contract.setStartDate(contractDTO.getStartDate());
+            }
+            if (contractDTO.getEndDate() != null) {
+                contract.setEndDate(contractDTO.getEndDate());
+            }
+            if (contractDTO.getContractValue() != null) {
+                contract.setContractValue(contractDTO.getContractValue());
+            }
+            if (contractDTO.getStatus() != null) {
+                contract.setStatus(contractDTO.getStatus());
+            }
+            if (contractDTO.getPaymentTerms() != null) {
+                contract.setPaymentTerms(contractDTO.getPaymentTerms());
+            }
+            if (contractDTO.getSeasonYear() != null) {
+                contract.setSeasonYear(contractDTO.getSeasonYear());
             }
 
-            LocalDate startDate = sponsorshipContractDTO.getStartDate();
-            if(startDate != null){
-                existingContract.setStartDate(startDate);
-            }
-
-            LocalDate endDate = sponsorshipContractDTO.getEndDate();
-            if (endDate != null){
-                existingContract.setEndDate(endDate);
-            }
-
-            BigDecimal contractValue = sponsorshipContractDTO.getContractValue();
-            if (contractValue != null){
-                existingContract.setContractValue(contractValue);
-            }
-
-            String paymentTerms = sponsorshipContractDTO.getPaymentTerms();
-            if (paymentTerms != null && !paymentTerms.isEmpty()){
-                existingContract.setPaymentTerms(paymentTerms);
-            }
-
-            String status = sponsorshipContractDTO.getStatus();
-            if (status != null && !status.isEmpty()){
-                existingContract.setStatus(status);
-            }
-
-            return Optional.of(ConvertUtils.convertToDTO(contractRepository.save(existingContract)));
+            SponsorshipContract updatedContract = contractRepository.save(contract);
+            return Optional.of(ConvertUtils.convertToDTO(updatedContract));
         }
 
         return Optional.empty();
     }
 
+    @Transactional
     public boolean deleteContract(Integer id) {
         if (contractRepository.existsById(id)) {
             contractRepository.deleteById(id);

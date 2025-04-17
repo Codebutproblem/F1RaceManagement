@@ -35,15 +35,15 @@ public final class ConvertUtils {
         return SponsorshipContractDTO.builder()
                 .contractId(sponsorshipContract.getContractId())
                 .sponsorId(sponsorshipContract.getSponsor().getSponsorId())
-                .sponsorshipTypeId(sponsorshipContract.getSponsorshipType().getTypeId())
+                .typeId(sponsorshipContract.getSponsorshipType().getTypeId())
                 .endDate(sponsorshipContract.getEndDate())
                 .startDate(sponsorshipContract.getStartDate())
-                .sponsorshipTypeId(sponsorshipContract.getSponsorshipType().getTypeId())
                 .paymentTerms(sponsorshipContract.getPaymentTerms())
                 .status(sponsorshipContract.getStatus())
                 .contractValue(sponsorshipContract.getContractValue())
                 .sponsorName(sponsorshipContract.getSponsor().getSponsorName())
                 .sponsorshipTypeName(sponsorshipContract.getSponsorshipType().getTypeName())
+                .seasonYear(sponsorshipContract.getSeasonYear())
                 .build();
     }
 

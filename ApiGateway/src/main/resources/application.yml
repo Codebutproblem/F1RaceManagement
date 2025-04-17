@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: teams-drivers-service
+          uri: lb://teams-drivers-service
+          predicates:
+            - Path=/api/teams/**,/api/drivers/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /api/$\{segment}
+
+        - id: sponsorship-service
+          uri: lb://sponsorship-service
+          predicates:
+            - Path=/api/sponsors/**,/api/sponsorship-contracts/**,/api/sponsorship-types/**,/api/sponsorship-payments/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /api/$\{segment}
+
+        - id: prize-payment-service
+          uri: lb://prize-payment-service
+          predicates:
+            - Path=/api/prize-payments/**,/api/prize-structures/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /api/$\{segment}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

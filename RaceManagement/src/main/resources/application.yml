@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: race-management-service
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/f1_race_management
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+server:
+  port: 8085
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

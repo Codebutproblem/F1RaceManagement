@@ -1,0 +1,142 @@
+version: '3.8'
+
+services:
+  # Databases
+  fi_prize_db:
+    image: mysql:8.0
+    container_name: mysql-prizes
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: f1_prizes_payments
+    ports:
+      - "3309:3306"
+    volumes:
+      - ./data/prizes:/docker-entrypoint-initdb.d
+
+  f1_sponsorship_db:
+    image: mysql:8.0
+    container_name: mysql-sponsorship
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: f1_sponsorship
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./data/sponsorship:/docker-entrypoint-initdb.d
+
+  f1_teams_drivers_db:
+    image: mysql:8.0
+    container_name: mysql-teams-drivers
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: f1_teams_drivers
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./data/teams_drivers:/docker-entrypoint-initdb.d
+
+  # Database management
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_ARBITRARY: 1
+    depends_on:
+      - fi_prize_db
+      - f1_sponsorship_db
+      - f1_teams_drivers_db
+
+  # Service Discovery
+  eureka-server:
+    build:
+      context: ./EurekaServer
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_APPLICATION_NAME=eureka-server
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_APPLICATION_NAME=api-gateway
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+
+  # Microservices
+  team_drivers_service:
+    build:
+      context: ./TeamDrivers
+      dockerfile: Dockerfile
+    container_name: team_drivers_service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - f1_teams_drivers_db
+      - eureka-server
+    environment:
+      - SPRING_APPLICATION_NAME=team-drivers-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-teams-drivers:3306/f1_teams_drivers
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  sponsorship_service:
+    build:
+      context: ./Sponsorship
+      dockerfile: Dockerfile
+    container_name: sponsorship_service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - f1_sponsorship_db
+      - eureka-server
+    environment:
+      - SPRING_APPLICATION_NAME=sponsorship-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-sponsorship:3306/f1_sponsorship
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  prize_payment_service:
+    build:
+      context: ./PrizePayment
+      dockerfile: Dockerfile
+    container_name: prize_payment_service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - fi_prize_db
+      - eureka-server
+    environment:
+      - SPRING_APPLICATION_NAME=prize-payment-service
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-prizes:3306/f1_prizes_payments
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
+  race_management_service:
+    build:
+      context: ./RaceManagement
+      dockerfile: Dockerfile
+    container_name: race_management_service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - eureka-server
+    environment:
+      - SPRING_APPLICATION_NAME=race-management-service
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/

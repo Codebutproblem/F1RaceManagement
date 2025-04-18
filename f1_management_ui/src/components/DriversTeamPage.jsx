@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Plus, Edit, Trash2, Search, X, Save, UserPlus, Building } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+const API_URL = "http://localhost:8080";
 
 const DriversTeamsPage = () => {
+
+  const navigate = useNavigate();
   // State for teams and drivers
   const [teams, setTeams] = useState([]);
   const [drivers, setDrivers] = useState([]);
@@ -43,31 +48,28 @@ const DriversTeamsPage = () => {
 
   // Fetch teams and drivers
   useEffect(() => {
-    // This would be replaced with actual API calls
-    // Example: fetch('/api/teams').then(res => res.json()).then(data => setTeams(data));
-    
-    // Mock data for demonstration
-    const mockTeams = [
-      { team_id: 1, team_name: 'Red Bull Racing', team_principal: 'Christian Horner', nationality: 'Austrian', headquarters: 'Milton Keynes, UK', founding_year: 2005 },
-      { team_id: 2, team_name: 'Mercedes-AMG Petronas', team_principal: 'Toto Wolff', nationality: 'German', headquarters: 'Brackley, UK', founding_year: 1970 },
-      { team_id: 3, team_name: 'Scuderia Ferrari', team_principal: 'Frédéric Vasseur', nationality: 'Italian', headquarters: 'Maranello, Italy', founding_year: 1950 },
-      { team_id: 4, team_name: 'McLaren Racing', team_principal: 'Andrea Stella', nationality: 'British', headquarters: 'Woking, UK', founding_year: 1966 }
-    ];
-    
-    const mockDrivers = [
-      { driver_id: 1, team_id: 1, first_name: 'Max', last_name: 'Verstappen', nationality: 'Dutch', date_of_birth: '1997-09-30', driver_number: 1, active_status: true },
-      { driver_id: 2, team_id: 1, first_name: 'Sergio', last_name: 'Perez', nationality: 'Mexican', date_of_birth: '1990-01-26', driver_number: 11, active_status: true },
-      { driver_id: 3, team_id: 2, first_name: 'Lewis', last_name: 'Hamilton', nationality: 'British', date_of_birth: '1985-01-07', driver_number: 44, active_status: true },
-      { driver_id: 4, team_id: 2, first_name: 'George', last_name: 'Russell', nationality: 'British', date_of_birth: '1998-02-15', driver_number: 63, active_status: true },
-      { driver_id: 5, team_id: 3, first_name: 'Charles', last_name: 'Leclerc', nationality: 'Monegasque', date_of_birth: '1997-10-16', driver_number: 16, active_status: true },
-      { driver_id: 6, team_id: 3, first_name: 'Carlos', last_name: 'Sainz', nationality: 'Spanish', date_of_birth: '1994-09-01', driver_number: 55, active_status: true },
-      { driver_id: 7, team_id: 4, first_name: 'Lando', last_name: 'Norris', nationality: 'British', date_of_birth: '1999-11-13', driver_number: 4, active_status: true },
-      { driver_id: 8, team_id: 4, first_name: 'Oscar', last_name: 'Piastri', nationality: 'Australian', date_of_birth: '2001-04-06', driver_number: 81, active_status: true }
-    ];
-    
-    setTeams(mockTeams);
-    setDrivers(mockDrivers);
-    setLoading(false);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [res1, res2] = await Promise.all([
+          fetch(`${API_URL}/api/teams`),
+          fetch(`${API_URL}/api/drivers`),
+        ]);
+
+        if(res1.ok){
+          const teamsData = await res1.json();
+          setTeams(teamsData);
+        }
+        if(res2.ok){
+          const driversData = await res2.json();
+          setDrivers(driversData);
+        }
+      } catch (error) {
+        console.error('Lỗi khi fetch API:', error);
+      }
+      setLoading(false);
+    };
+    fetchData()
   }, []);
 
   // Filter teams and drivers based on search
@@ -84,135 +86,241 @@ const DriversTeamsPage = () => {
   );
 
   // Handle team form submit
-  const handleTeamSubmit = (e) => {
+  const handleTeamSubmit = async (e) => {
     e.preventDefault();
     
-    if (editingTeamId) {
-      // Update existing team
-      const updatedTeams = teams.map(team => 
-        team.team_id === editingTeamId ? 
-        { ...team, 
-          team_name: teamForm.teamName,
-          team_principal: teamForm.teamPrincipal,
-          nationality: teamForm.nationality,
-          headquarters: teamForm.headquarters,
-          founding_year: parseInt(teamForm.foundingYear)
-        } : team
-      );
-      setTeams(updatedTeams);
-    } else {
-      // Add new team
-      const newTeam = {
-        team_id: teams.length + 1,
-        team_name: teamForm.teamName,
-        team_principal: teamForm.teamPrincipal,
-        nationality: teamForm.nationality,
-        headquarters: teamForm.headquarters,
-        founding_year: parseInt(teamForm.foundingYear)
-      };
-      setTeams([...teams, newTeam]);
-    }
+    const teamData = {
+      team_name: teamForm.teamName,
+      team_principal: teamForm.teamPrincipal,
+      nationality: teamForm.nationality,
+      headquarters: teamForm.headquarters,
+      founding_year: parseInt(teamForm.foundingYear)
+    };
     
-    // Reset form and close modal
-    setTeamForm({
-      teamName: '',
-      teamPrincipal: '',
-      nationality: '',
-      headquarters: '',
-      foundingYear: '',
-    });
-    setEditingTeamId(null);
-    setShowTeamModal(false);
+    try {
+      if (editingTeamId) {
+        // Update existing team
+        const response = await fetch(`${API_URL}/api/teams/${editingTeamId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(teamData),
+        });
+        
+        if (response.ok) {
+          const updatedTeam = await response.json();
+          setTeams(teams.map(team => team.team_id === editingTeamId ? updatedTeam : team));
+        } else {
+          console.error('Failed to update team');
+        }
+      } else {
+        // Add new team
+        const response = await fetch(`${API_URL}/api/teams`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(teamData),
+        });
+        
+        if (response.ok) {
+          const newTeam = await response.json();
+          setTeams([...teams, newTeam]);
+        } else {
+          console.error('Failed to create team');
+        }
+      }
+      
+      // Reset form and close modal
+      setTeamForm({
+        teamName: '',
+        teamPrincipal: '',
+        nationality: '',
+        headquarters: '',
+        foundingYear: '',
+      });
+      setEditingTeamId(null);
+      setShowTeamModal(false);
+    } catch (error) {
+      console.error('Error submitting team form:', error);
+    }
   };
 
   // Handle driver form submit
-  const handleDriverSubmit = (e) => {
+  const handleDriverSubmit = async (e) => {
     e.preventDefault();
     
-    if (editingDriverId) {
-      // Update existing driver
-      const updatedDrivers = drivers.map(driver => 
-        driver.driver_id === editingDriverId ? 
-        { ...driver, 
-          first_name: driverForm.firstName,
-          last_name: driverForm.lastName,
-          team_id: parseInt(driverForm.teamId),
-          nationality: driverForm.nationality,
-          date_of_birth: driverForm.dateOfBirth,
-          driver_number: parseInt(driverForm.driverNumber),
-          active_status: driverForm.activeStatus
-        } : driver
-      );
-      setDrivers(updatedDrivers);
-    } else {
-      // Add new driver
-      const newDriver = {
-        driver_id: drivers.length + 1,
-        first_name: driverForm.firstName,
-        last_name: driverForm.lastName,
-        team_id: parseInt(driverForm.teamId),
-        nationality: driverForm.nationality,
-        date_of_birth: driverForm.dateOfBirth,
-        driver_number: parseInt(driverForm.driverNumber),
-        active_status: driverForm.activeStatus
-      };
-      setDrivers([...drivers, newDriver]);
-    }
+    const driverData = {
+      first_name: driverForm.firstName,
+      last_name: driverForm.lastName,
+      team_id: parseInt(driverForm.teamId),
+      nationality: driverForm.nationality,
+      date_of_birth: driverForm.dateOfBirth,
+      driver_number: parseInt(driverForm.driverNumber),
+      active_status: driverForm.activeStatus
+    };
     
-    // Reset form and close modal
-    setDriverForm({
-      firstName: '',
-      lastName: '',
-      teamId: '',
-      nationality: '',
-      dateOfBirth: '',
-      driverNumber: '',
-      activeStatus: true
-    });
-    setEditingDriverId(null);
-    setShowDriverModal(false);
+    try {
+      if (editingDriverId) {
+        // Update existing driver
+        const response = await fetch(`${API_URL}/api/drivers/${editingDriverId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(driverData),
+        });
+        
+        if (response.ok) {
+          const updatedDriver = await response.json();
+          setDrivers(drivers.map(driver => driver.driver_id === editingDriverId ? updatedDriver : driver));
+        } else {
+          console.error('Failed to update driver');
+        }
+      } else {
+        // Add new driver
+        const response = await fetch(`${API_URL}/api/drivers`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(driverData),
+        });
+        
+        if (response.ok) {
+          const newDriver = await response.json();
+          setDrivers([...drivers, newDriver]);
+        } else {
+          console.error('Failed to create driver');
+        }
+      }
+      
+      // Reset form and close modal
+      setDriverForm({
+        firstName: '',
+        lastName: '',
+        teamId: '',
+        nationality: '',
+        dateOfBirth: '',
+        driverNumber: '',
+        activeStatus: true
+      });
+      setEditingDriverId(null);
+      setShowDriverModal(false);
+    } catch (error) {
+      console.error('Error submitting driver form:', error);
+    }
   };
 
   // Edit team
-  const editTeam = (team) => {
-    setTeamForm({
-      teamName: team.team_name,
-      teamPrincipal: team.team_principal,
-      nationality: team.nationality,
-      headquarters: team.headquarters,
-      foundingYear: team.founding_year.toString(),
-    });
-    setEditingTeamId(team.team_id);
-    setShowTeamModal(true);
+  const editTeam = async (team) => {
+    try {
+      const response = await fetch(`${API_URL}/api/teams/${team.team_id}`);
+      if (response.ok) {
+        const teamData = await response.json();
+        setTeamForm({
+          teamName: teamData.team_name,
+          teamPrincipal: teamData.team_principal,
+          nationality: teamData.nationality,
+          headquarters: teamData.headquarters,
+          foundingYear: teamData.founding_year.toString(),
+        });
+        setEditingTeamId(team.team_id);
+        setShowTeamModal(true);
+      } else {
+        console.error('Failed to fetch team details');
+      }
+    } catch (error) {
+      console.error('Error fetching team details:', error);
+      // Fall back to using provided team data
+      setTeamForm({
+        teamName: team.team_name,
+        teamPrincipal: team.team_principal,
+        nationality: team.nationality,
+        headquarters: team.headquarters,
+        foundingYear: team.founding_year.toString(),
+      });
+      setEditingTeamId(team.team_id);
+      setShowTeamModal(true);
+    }
   };
 
   // Delete team
-  const deleteTeam = (teamId) => {
+  const deleteTeam = async (teamId) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa đội đua này?')) {
-      setTeams(teams.filter(team => team.team_id !== teamId));
-      // Also delete associated drivers or handle as needed
+      try {
+        const response = await fetch(`${API_URL}/api/teams/${teamId}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          setTeams(teams.filter(team => team.team_id !== teamId));
+          
+          // Also filter out drivers from this team
+          setDrivers(drivers.filter(driver => driver.team_id !== teamId));
+        } else {
+          console.error('Failed to delete team');
+        }
+      } catch (error) {
+        console.error('Error deleting team:', error);
+      }
     }
   };
 
   // Edit driver
-  const editDriver = (driver) => {
-    setDriverForm({
-      firstName: driver.first_name,
-      lastName: driver.last_name,
-      teamId: driver.team_id.toString(),
-      nationality: driver.nationality,
-      dateOfBirth: driver.date_of_birth,
-      driverNumber: driver.driver_number.toString(),
-      activeStatus: driver.active_status
-    });
-    setEditingDriverId(driver.driver_id);
-    setShowDriverModal(true);
+  const editDriver = async (driver) => {
+    try {
+      const response = await fetch(`${API_URL}/api/drivers/${driver.driver_id}`);
+      if (response.ok) {
+        const driverData = await response.json();
+        setDriverForm({
+          firstName: driverData.first_name,
+          lastName: driverData.last_name,
+          teamId: driverData.team_id.toString(),
+          nationality: driverData.nationality,
+          dateOfBirth: driverData.date_of_birth,
+          driverNumber: driverData.driver_number.toString(),
+          activeStatus: driverData.active_status
+        });
+        setEditingDriverId(driver.driver_id);
+        setShowDriverModal(true);
+      } else {
+        console.error('Failed to fetch driver details');
+      }
+    } catch (error) {
+      console.error('Error fetching driver details:', error);
+      // Fall back to using provided driver data
+      setDriverForm({
+        firstName: driver.first_name,
+        lastName: driver.last_name,
+        teamId: driver.team_id.toString(),
+        nationality: driver.nationality,
+        dateOfBirth: driver.date_of_birth,
+        driverNumber: driver.driver_number.toString(),
+        activeStatus: driver.active_status
+      });
+      setEditingDriverId(driver.driver_id);
+      setShowDriverModal(true);
+    }
   };
 
   // Delete driver
-  const deleteDriver = (driverId) => {
+  const deleteDriver = async (driverId) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa tay đua này?')) {
-      setDrivers(drivers.filter(driver => driver.driver_id !== driverId));
+      try {
+        const response = await fetch(`${API_URL}/api/drivers/${driverId}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          setDrivers(drivers.filter(driver => driver.driver_id !== driverId));
+        } else {
+          console.error('Failed to delete driver');
+        }
+      } catch (error) {
+        console.error('Error deleting driver:', error);
+      }
     }
   };
 
@@ -222,13 +330,30 @@ const DriversTeamsPage = () => {
     return team ? team.team_name : 'Unknown Team';
   };
 
+  // Load drivers by team (for future use)
+  const loadDriversByTeam = async (teamId) => {
+    try {
+      const response = await fetch(`${API_URL}/api/drivers/team/${teamId}`);
+      if (response.ok) {
+        const teamDrivers = await response.json();
+        return teamDrivers;
+      }
+    } catch (error) {
+      console.error(`Error loading drivers for team ${teamId}:`, error);
+      return [];
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex items-center">
           <button 
-            onClick={() => console.log('Navigate back to home')} 
+            onClick={() => {
+              navigate(-1)
+              console.log('Navigate back to home')
+            }} 
             className="mr-4 p-2 rounded-full hover:bg-gray-100"
           >
             <ChevronLeft size={24} />

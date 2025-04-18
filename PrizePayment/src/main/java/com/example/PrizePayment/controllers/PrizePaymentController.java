@@ -25,14 +25,9 @@ public class PrizePaymentController {
         return ResponseEntity.ok(prizePaymentService.getPaymentsByRaceId(raceId));
     }
 
-    @GetMapping("/driver/{driverId}")
-    public ResponseEntity<List<PrizePaymentDTO>> getPrizePaymentByDriverId(@PathVariable Integer driverId) {
-        return ResponseEntity.ok(prizePaymentService.getPaymentsByDriverId(driverId));
-    }
-
-    @GetMapping("/team/{teamId}")
-    public ResponseEntity<List<PrizePaymentDTO>> getPrizePaymentByTeamId(@PathVariable Integer teamId) {
-        return ResponseEntity.ok(prizePaymentService.getPaymentsByTeamId(teamId));
+    @GetMapping("/recipient/{recipientId}")
+    public ResponseEntity<List<PrizePaymentDTO>> getPrizePaymentByRecipientId(@PathVariable Integer recipientId) {
+        return ResponseEntity.ok(prizePaymentService.getPaymentsByRecipientId(recipientId));
     }
 
     @PostMapping

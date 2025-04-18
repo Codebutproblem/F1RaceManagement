@@ -44,7 +44,7 @@ const RacesAwardsPage = () => {
 
     const [paymentForm, setPaymentForm] = useState({
         raceId: '',
-        recipientType: 'driver',  // 'driver' or 'team'
+        recipientType: 'Driver',  // 'driver' or 'team'
         recipientId: '',
         amount: '',
         paymentDate: new Date().toISOString().split('T')[0],
@@ -131,12 +131,12 @@ const RacesAwardsPage = () => {
 
         // Sample prize payments
         var mockPrizePayments = [
-            { payment_id: 1, race_id: 1, recipient_type: 'driver', recipient_id: 1, amount: 25000000, payment_date: '2025-03-03', payment_method: 'Bank Transfer', notes: 'Winner prize for Bahrain GP' },
-            { payment_id: 2, race_id: 1, recipient_type: 'team', recipient_id: 1, amount: 12500000, payment_date: '2025-03-03', payment_method: 'Bank Transfer', notes: 'Team prize for Bahrain GP winner' },
-            { payment_id: 3, race_id: 1, recipient_type: 'driver', recipient_id: 3, amount: 18000000, payment_date: '2025-03-03', payment_method: 'Bank Transfer', notes: '2nd place prize for Bahrain GP' },
-            { payment_id: 4, race_id: 1, recipient_type: 'team', recipient_id: 2, amount: 9000000, payment_date: '2025-03-03', payment_method: 'Bank Transfer', notes: 'Team prize for Bahrain GP 2nd place' },
-            { payment_id: 5, race_id: 2, recipient_type: 'driver', recipient_id: 1, amount: 28000000, payment_date: '2025-03-10', payment_method: 'Bank Transfer', notes: 'Winner + fastest lap prize for Saudi Arabian GP' },
-            { payment_id: 6, race_id: 2, recipient_type: 'team', recipient_id: 1, amount: 14000000, payment_date: '2025-03-10', payment_method: 'Bank Transfer', notes: 'Team prize for Saudi Arabian GP winner + fastest lap' }
+            { payment_id: 1, race_id: 1, recipient_type: 'Driver', recipient_id: 1, amount: 25000000, payment_date: '2025-03-03', payment_method: 'Bank Transfer', notes: 'Winner prize for Bahrain GP' },
+            { payment_id: 2, race_id: 1, recipient_type: 'Team', recipient_id: 1, amount: 12500000, payment_date: '2025-03-03', payment_method: 'Bank Transfer', notes: 'Team prize for Bahrain GP winner' },
+            { payment_id: 3, race_id: 1, recipient_type: 'Driver', recipient_id: 3, amount: 18000000, payment_date: '2025-03-03', payment_method: 'Bank Transfer', notes: '2nd place prize for Bahrain GP' },
+            { payment_id: 4, race_id: 1, recipient_type: 'Team', recipient_id: 2, amount: 9000000, payment_date: '2025-03-03', payment_method: 'Bank Transfer', notes: 'Team prize for Bahrain GP 2nd place' },
+            { payment_id: 5, race_id: 2, recipient_type: 'Driver', recipient_id: 1, amount: 28000000, payment_date: '2025-03-10', payment_method: 'Bank Transfer', notes: 'Winner + fastest lap prize for Saudi Arabian GP' },
+            { payment_id: 6, race_id: 2, recipient_type: 'Team', recipient_id: 1, amount: 14000000, payment_date: '2025-03-10', payment_method: 'Bank Transfer', notes: 'Team prize for Saudi Arabian GP winner + fastest lap' }
         ];
 
         var fetchData = async () => {
@@ -149,11 +149,22 @@ const RacesAwardsPage = () => {
                     fetch(API_URL + '/api/prize-payments')
                 ]);
 
-                mockRaces = await res1.json();
-                mockResults = await res2.json();
-                mockTeams = await res3.json();
-                mockDrivers = await res4.json();
-                mockPrizePayments = await res5.json();
+                
+                if(res1.ok){
+                    mockRaces = await res1.json();
+                }
+                if(res2.ok){
+                    mockResults = await res2.json();
+                }
+                if(res3.ok){
+                    mockTeams = await res3.json();
+                }
+                if(res4.ok){
+                    mockDrivers = await res4.json();
+                }
+                if(res5.ok){
+                    mockPrizePayments = await res5.json();
+                }
 
             } catch (error) {
                 console.error('Lỗi khi fetch API:', error);
@@ -359,7 +370,7 @@ const RacesAwardsPage = () => {
             // Reset form and close modal
             setPaymentForm({
                 raceId: '',
-                recipientType: 'driver',
+                recipientType: 'Driver',
                 recipientId: '',
                 amount: '',
                 paymentDate: new Date().toISOString().split('T')[0],
@@ -533,7 +544,7 @@ const RacesAwardsPage = () => {
 
         setPaymentForm({
             raceId: result.race_id.toString(),
-            recipientType: 'driver',
+            recipientType: 'Driver',
             recipientId: result.driver_id.toString(),
             amount: driverPrize.toString(),
             paymentDate: new Date().toISOString().split('T')[0],
@@ -551,7 +562,7 @@ const RacesAwardsPage = () => {
 
         setPaymentForm({
             raceId: result.race_id.toString(),
-            recipientType: 'team',
+            recipientType: 'Team',
             recipientId: result.team_id.toString(),
             amount: teamPrize.toString(),
             paymentDate: new Date().toISOString().split('T')[0],
@@ -889,8 +900,8 @@ const RacesAwardsPage = () => {
                                         {raceResults.map((result) => {
                                             const driverPrize = getPrizeAmount(result.finish_position, result.fastest_lap === 1);
                                             const teamPrize = getTeamPrize(driverPrize);
-                                            const driverPaid = hasPayment(result.race_id, 'driver', result.driver_id);
-                                            const teamPaid = hasPayment(result.race_id, 'team', result.team_id);
+                                            const driverPaid = hasPayment(result.race_id, 'Driver', result.driver_id);
+                                            const teamPaid = hasPayment(result.race_id, 'Team', result.team_id);
 
                                             return (
                                                 <tr key={result.result_id}>
@@ -1007,7 +1018,7 @@ const RacesAwardsPage = () => {
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm font-medium text-gray-900">
-                                                            {payment.recipient_type === 'driver'
+                                                            {payment.recipient_type === 'Driver'
                                                                 ? getDriverName(payment.recipient_id)
                                                                 : getTeamName(payment.recipient_id)}
                                                         </div>
@@ -1017,7 +1028,7 @@ const RacesAwardsPage = () => {
                                                             ? 'bg-blue-100 text-blue-800'
                                                             : 'bg-green-100 text-green-800'
                                                             }`}>
-                                                            {payment.recipient_type === 'driver' ? 'Tay đua' : 'Đội đua'}
+                                                            {payment.recipient_type === 'Driver' ? 'Tay đua' : 'Đội đua'}
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -1045,7 +1056,7 @@ const RacesAwardsPage = () => {
                                 onClick={() => {
                                     setPaymentForm({
                                         raceId: '',
-                                        recipientType: 'driver',
+                                        recipientType: 'Driver',
                                         recipientId: '',
                                         amount: '',
                                         paymentDate: new Date().toISOString().split('T')[0],
@@ -1087,7 +1098,7 @@ const RacesAwardsPage = () => {
                                                     <dt className="text-sm font-medium text-gray-500 truncate">Thanh toán cho tay đua</dt>
                                                     <dd className="mt-1 text-3xl font-semibold text-gray-900">
                                                         {formatCurrency(prizePayments
-                                                            .filter(payment => payment.recipient_type === 'driver')
+                                                            .filter(payment => payment.recipient_type === 'Driver')
                                                             .reduce((sum, payment) => sum + payment.amount, 0))}
                                                     </dd>
                                                 </dl>
@@ -1099,7 +1110,7 @@ const RacesAwardsPage = () => {
                                                     <dt className="text-sm font-medium text-gray-500 truncate">Thanh toán cho đội đua</dt>
                                                     <dd className="mt-1 text-3xl font-semibold text-gray-900">
                                                         {formatCurrency(prizePayments
-                                                            .filter(payment => payment.recipient_type === 'team')
+                                                            .filter(payment => payment.recipient_type === 'Team')
                                                             .reduce((sum, payment) => sum + payment.amount, 0))}
                                                     </dd>
                                                 </dl>
@@ -1150,17 +1161,17 @@ const RacesAwardsPage = () => {
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap">
                                                                 <div className="text-sm font-medium text-gray-900">
-                                                                    {payment.recipient_type === 'driver'
+                                                                    {payment.recipient_type === 'Driver'
                                                                         ? getDriverName(payment.recipient_id)
                                                                         : getTeamName(payment.recipient_id)}
                                                                 </div>
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${payment.recipient_type === 'driver'
+                                                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${payment.recipient_type === 'Driver'
                                                                     ? 'bg-blue-100 text-blue-800'
                                                                     : 'bg-green-100 text-green-800'
                                                                     }`}>
-                                                                    {payment.recipient_type === 'driver' ? 'Tay đua' : 'Đội đua'}
+                                                                    {payment.recipient_type === 'Driver' ? 'Tay đua' : 'Đội đua'}
                                                                 </span>
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -1551,8 +1562,8 @@ const RacesAwardsPage = () => {
                                                         id="recipient-driver"
                                                         name="recipient-type"
                                                         type="radio"
-                                                        checked={paymentForm.recipientType === 'driver'}
-                                                        onChange={() => setPaymentForm({ ...paymentForm, recipientType: 'driver', recipientId: '' })}
+                                                        checked={paymentForm.recipientType === 'Driver'}
+                                                        onChange={() => setPaymentForm({ ...paymentForm, recipientType: 'Driver', recipientId: '' })}
                                                         className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                                     />
                                                     <label htmlFor="recipient-driver" className="ml-2 block text-sm text-gray-700">
@@ -1564,8 +1575,8 @@ const RacesAwardsPage = () => {
                                                         id="recipient-team"
                                                         name="recipient-type"
                                                         type="radio"
-                                                        checked={paymentForm.recipientType === 'team'}
-                                                        onChange={() => setPaymentForm({ ...paymentForm, recipientType: 'team', recipientId: '' })}
+                                                        checked={paymentForm.recipientType === 'Team'}
+                                                        onChange={() => setPaymentForm({ ...paymentForm, recipientType: 'Team', recipientId: '' })}
                                                         className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300"
                                                     />
                                                     <label htmlFor="recipient-team" className="ml-2 block text-sm text-gray-700">
@@ -1579,7 +1590,7 @@ const RacesAwardsPage = () => {
                                             <label className="block text-sm font-medium text-gray-700">
                                                 Người nhận
                                             </label>
-                                            {paymentForm.recipientType === 'driver' ? (
+                                            {paymentForm.recipientType === 'Driver' ? (
                                                 <select
                                                     required
                                                     value={paymentForm.recipientId}

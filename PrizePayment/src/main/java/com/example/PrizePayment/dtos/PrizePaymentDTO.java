@@ -11,10 +11,10 @@ import java.time.LocalDate;
 public class PrizePaymentDTO {
     private Integer paymentId;
     private Integer raceId;
-    private Integer driverId;
     private Integer recipientId;
-    private Integer teamId;
     private BigDecimal amount;
     private String recipientType;
     private LocalDate paymentDate;
+    private String paymentMethod;
+    private String notes;
 }

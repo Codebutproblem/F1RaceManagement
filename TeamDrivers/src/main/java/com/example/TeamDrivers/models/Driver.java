@@ -19,10 +19,11 @@ public class Driver {
 
     @Id
     @Column(name = "driver_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer driverId;
 
     @ManyToOne
-    @JoinColumn(name = "team_id")
+    @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
     @Column(name = "first_name", nullable = false)

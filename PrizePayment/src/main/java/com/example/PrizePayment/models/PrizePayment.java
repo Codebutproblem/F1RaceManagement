@@ -20,24 +20,27 @@ import java.time.LocalDate;
 public class PrizePayment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "payment_id")
     private Integer paymentId;
-
-    @Column(nullable = false)
-    private Integer raceId;
-
-    private Integer driverId;
-
-    private Integer teamId;
-
-    @Column(name = "recipient_id", nullable = false)
-    private Integer recipientId;
-
-    @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal amount;
 
     @Column(name = "recipient_type", nullable = false, length = 10)
     private String recipientType;
 
+    @Column(name = "recipient_id", nullable = false)
+    private Integer recipientId;
+
+    @Column(name = "race_id", nullable = false)
+    private Integer raceId;
+
+    @Column(name = "amount", nullable = false, precision = 15, scale = 2)
+    private BigDecimal amount;
+
     @Column(name = "payment_date")
     private LocalDate paymentDate;
+
+    @Column(name = "payment_method", nullable = false, length = 25)
+    private String paymentMethod;
+
+    @Column(name = "notes", columnDefinition = "TEXT")
+    private String notes;
 }

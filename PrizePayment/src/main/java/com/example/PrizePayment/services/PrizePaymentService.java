@@ -27,14 +27,8 @@ public class PrizePaymentService {
                 .collect(Collectors.toList());
     }
 
-    public List<PrizePaymentDTO> getPaymentsByDriverId(Integer driverId) {
-        return prizePaymentRepository.findByDriverId(driverId).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<PrizePaymentDTO> getPaymentsByTeamId(Integer teamId) {
-        return prizePaymentRepository.findByTeamId(teamId).stream()
+    public List<PrizePaymentDTO> getPaymentsByRecipientId(Integer recipientId) {
+        return prizePaymentRepository.findByRecipientId(recipientId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -57,25 +51,25 @@ public class PrizePaymentService {
         return PrizePaymentDTO.builder()
                 .paymentId(prizePayment.getPaymentId())
                 .raceId(prizePayment.getRaceId())
-                .driverId(prizePayment.getDriverId())
-                .teamId(prizePayment.getTeamId())
                 .amount(prizePayment.getAmount())
                 .recipientType(prizePayment.getRecipientType())
                 .paymentDate(prizePayment.getPaymentDate())
                 .recipientId(prizePayment.getRecipientId())
+                .notes(prizePayment.getNotes())
+                .paymentMethod(prizePayment.getPaymentMethod())
                 .build();
     }
 
     private PrizePayment convertToEntity(PrizePaymentDTO dto) {
         PrizePayment payment = new PrizePayment();
         payment.setPaymentId(dto.getPaymentId());
-        payment.setTeamId(dto.getTeamId());
         payment.setRaceId(dto.getRaceId());
-        payment.setDriverId(dto.getDriverId());
         payment.setAmount(dto.getAmount());
         payment.setRecipientType(dto.getRecipientType());
         payment.setPaymentDate(dto.getPaymentDate());
         payment.setRecipientId(dto.getRecipientId());
+        payment.setNotes(dto.getNotes());
+        payment.setPaymentMethod(dto.getPaymentMethod());
         return payment;
     }
 }

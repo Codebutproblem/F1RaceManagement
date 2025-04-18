@@ -19,6 +19,7 @@ public class Team {
 
     @Id
     @Column(name = "team_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer teamId;
 
     @Column(name = "team_name", nullable = false)

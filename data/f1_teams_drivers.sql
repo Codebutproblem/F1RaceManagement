@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `drivers` (
   `driver_id` int(11) NOT NULL,
-  `team_id` int(11) DEFAULT NULL,
+  `team_id` int(11) NOT NULL,
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   `nationality` varchar(50) DEFAULT NULL,

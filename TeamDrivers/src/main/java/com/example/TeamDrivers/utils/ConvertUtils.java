@@ -44,6 +44,8 @@ public final class ConvertUtils {
 
     public static Driver convertToDriver(DriverDTO driverDTO){
         Driver driver = new Driver();
+        Team team = new Team();
+        team.setTeamId(driverDTO.getTeamId());
         driver.setDriverId(driverDTO.getDriverId());
         driver.setFirstName(driverDTO.getFirstName());
         driver.setLastName(driverDTO.getLastName());
@@ -55,6 +57,7 @@ public final class ConvertUtils {
         driver.setActiveStatus(driverDTO.getActiveStatus());
         driver.setCreatedAt(driverDTO.getCreatedAt());
         driver.setUpdatedAt(driverDTO.getUpdatedAt());
+        driver.setTeam(team);
         return driver;
     }
 
